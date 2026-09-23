@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mango Analytics Pro - Analizador de Gestiones, Promesas y Operadores (CRM Mango)</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- SheetJS para procesar Excel (.xlsx, .xls) y CSV localmente -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+    /* Estilo scrollbar fino */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 selection:bg-emerald-500 selection:text-white pb-12">
+
+  <!-- ========================================== -->
+  <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+  <!-- ========================================== -->
+  <header class="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-40 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Logo y Nombre de la Plataforma -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white text-xl">
+            <i class="fas fa-file-excel"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="font-extrabold text-base sm:text-lg tracking-tight">Mango<span class="text-emerald-400">Analytics Pro</span></h1>
+              <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded-full border border-emerald-400/30">v1.0 Mango CRM</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Auditoría de Gestiones, Promesas y Monitoreo de Operadores</p>
+          </div>
+        </div>
+
+        <!-- Enlaces rápidos y botón demo -->
+        <div class="flex items-center gap-3">
+          <button id="btn-mango-cargar-demo" class="px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5">
+            <i class="fas fa-wand-magic-sparkles text-amber-300"></i>
+            <span class="hidden sm:inline">Cargar Ejemplo Foto Mango (1 Clic)</span>
+            <span class="sm:hidden">Ejemplo Demo</span>
+          </button>
+
+          <a href="index.html" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition-all border border-slate-700 flex items-center gap-1.5">
+            <i class="fas fa-arrow-left"></i>
+            <span class="hidden sm:inline">Ir a CobranzasPro</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- CONTENEDOR PRINCIPAL -->
+  <!-- ========================================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Banner Informativo -->
+    <div class="p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white border border-emerald-500/20 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-xs border border-emerald-500/30">
+            negociatudeuda.com.ar
+          </span>
+          <span class="text-xs text-slate-400">Compatibilidad nativa con CRM Mango</span>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-black text-white">Auditoría Operativa y Rendimiento de Cobranzas</h2>
+        <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+          Sube el archivo Excel exportado de Mango CRM para analizar de forma instantánea qué DNI tocó cada operador, cuántas gestiones y promesas consiguieron, el monto recaudado y los puntos críticos para mejorar la calidad de los datos de gestión.
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-2 shrink-0">
+        <button onclick="document.getElementById('mango-file-input').click()" class="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition-all shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2">
+          <i class="fas fa-upload"></i> Subir Excel de Mango
+        </button>
+      </div>
+    </div>
+
+    <!-- Zona de Carga Drag & Drop -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+      <div id="mango-drop-zone" class="border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-slate-50/70 hover:bg-emerald-50/30 rounded-2xl p-8 text-center transition-all cursor-pointer">
+        <input type="file" id="mango-file-input" accept=".xlsx, .xls, .csv, .txt" class="hidden" />
+        <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3 text-2xl shadow-sm">
+          <i class="fas fa-cloud-arrow-up"></i>
+        </div>
+        <div id="mango-drop-text" class="text-sm text-slate-700">
+          <span class="text-emerald-700 font-extrabold hover:underline">Haz clic aquí para seleccionar o arrastra tu archivo Excel (.xlsx / .xls)</span> o CSV de CRM Mango
+          <p class="text-xs text-slate-400 mt-1">Detecta automáticamente columnas como <code class="font-mono text-slate-600">personas.nNumeroDocumento</code>, <code class="font-mono text-slate-600">usuarios.cNombre</code>, <code class="font-mono text-slate-600">resultados.cDescripcion</code>, <code class="font-mono text-slate-600">gestiones.nMonto</code>, etc.</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between text-xs text-slate-500 bg-slate-100/70 px-4 py-2.5 rounded-xl">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-shield-halved text-emerald-600 text-sm"></i>
+          <span><strong>Privacidad Total Garantizada:</strong> El archivo se lee 100% en tu navegador con SheetJS. Ningún dato de deudores ni teléfonos sale de tu computadora.</span>
+        </div>
+        <div class="text-[11px] text-slate-400">
+          Archivos compatibles: .xlsx, .xls, .csv exportados de Mango
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- CONTENEDOR DE ANÁLISIS (Se muestra al procesar el archivo) -->
+    <!-- ============================================================= -->
+    <div id="mango-analisis-container" class="hidden space-y-6 animate-fadeIn">
+
+      <!-- Barra de Filtros Cruzados -->
+      <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+        <div class="flex items-center justify-between border-b pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs">
+              <i class="fas fa-sliders"></i>
+            </div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Filtros Dinámicos del Reporte</h3>
+          </div>
+          <button id="btn-mango-limpiar-filtros" class="text-xs text-slate-400 hover:text-rose-600 font-semibold flex items-center gap-1 transition-colors">
+            <i class="fas fa-rotate-left"></i> Restablecer Filtros
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 text-xs">
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Cartera / Entidad</label>
+            <select id="mango-filtro-entidad" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-emerald-500">
+              <option value="TODOS">Todas las Carteras</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Operador</label>
+            <select id="mango-filtro-operador" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-emerald-500">
+              <option value="TODOS">Todos los Operadores</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Canal de Gestión</label>
+            <select id="mango-filtro-canal" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-emerald-500">
+              <option value="TODOS">Todos los Canales</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Resultado / Tipificación</label>
+            <select id="mango-filtro-resultado" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-emerald-500">
+              <option value="TODOS">Todos los Resultados</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Criterio de Fecha</label>
+            <select id="mango-filtro-tipo-fecha" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-emerald-500">
+              <option value="GESTION" selected>Fecha Gestión (dtFechHora)</option>
+              <option value="PROXIMA">Próx. Acción (dtProxAcci)</option>
+              <option value="AMBAS">Ambas Fechas</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Fecha Desde</label>
+            <input type="date" id="mango-filtro-fecha-desde" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-emerald-500 font-medium" />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Fecha Hasta</label>
+            <input type="date" id="mango-filtro-fecha-hasta" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-emerald-500 font-medium" />
+          </div>
+        </div>
+
+        <!-- Barra de Acciones y Atajos de Filtro -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Botón Principal de Acción -->
+            <button id="btn-mango-aplicar-filtros" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-xs font-black transition-all shadow-md shadow-emerald-600/20 flex items-center gap-2">
+              <i class="fas fa-filter text-emerald-200"></i>
+              <span>Aplicar Filtros</span>
+            </button>
+
+            <button id="btn-mango-limpiar-filtros-bar" onclick="MangoAnalyzerModule.limpiarFiltros()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5">
+              <i class="fas fa-rotate-left"></i>
+              <span>Restablecer</span>
+            </button>
+
+            <!-- Atajos Rápidos de Fechas -->
+            <div class="hidden sm:flex items-center gap-1 pl-2 border-l border-slate-200 text-[11px]">
+              <span class="text-slate-400 font-semibold mr-1">Rango:</span>
+              <button type="button" onclick="MangoAnalyzerModule.establecerRangoFecha('hoy')" class="px-2 py-1 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 rounded-lg font-bold transition-colors">Hoy</button>
+              <button type="button" onclick="MangoAnalyzerModule.establecerRangoFecha('7dias')" class="px-2 py-1 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 rounded-lg font-bold transition-colors">Últimos 7d</button>
+              <button type="button" onclick="MangoAnalyzerModule.establecerRangoFecha('mes')" class="px-2 py-1 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 rounded-lg font-bold transition-colors">Este Mes</button>
+              <button type="button" onclick="MangoAnalyzerModule.establecerRangoFecha('todo')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg font-bold transition-colors">Todo</button>
+            </div>
+          </div>
+
+          <!-- Resumen dinámico del filtro -->
+          <div id="mango-filtros-resumen" class="text-xs text-slate-500 font-medium"></div>
+        </div>
+      </div>
+
+      <!-- Tarjetas de KPIs Principales -->
+      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Total Gestiones -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Gestiones</span>
+            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
+              <i class="fas fa-list-check"></i>
+            </div>
+          </div>
+          <div id="mango-kpi-gestiones" class="text-3xl font-black text-slate-800 mt-2">0</div>
+          <div class="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
+            <span>Intensidad:</span>
+            <strong id="mango-kpi-intensidad" class="text-blue-600 font-bold">0 toques/DNI</strong>
+          </div>
+        </div>
+
+        <!-- DNIs Únicos Tocados -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">DNIs Únicos Tocados</span>
+            <div class="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg">
+              <i class="fas fa-id-card"></i>
+            </div>
+          </div>
+          <div id="mango-kpi-dnis" class="text-3xl font-black text-slate-800 mt-2">0</div>
+          <div class="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
+            <span>Contactabilidad:</span>
+            <strong id="mango-kpi-contactabilidad" class="text-purple-600 font-bold">0%</strong>
+          </div>
+          <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span class="flex items-center gap-1"><i class="fas fa-gauge-high text-purple-500"></i> Ritmo Diario:</span>
+            <strong id="mango-kpi-promedio-dnis-dia" class="text-purple-700 font-bold">0 DNIs/día (Meta: 60)</strong>
+          </div>
+        </div>
+
+        <!-- Promesas Conseguidas -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Promesas Conseguidas</span>
+            <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+              <i class="fas fa-handshake"></i>
+            </div>
+          </div>
+          <div id="mango-kpi-promesas" class="text-3xl font-black text-emerald-600 mt-2">0</div>
+          <div class="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
+            <span>Conversión:</span>
+            <strong id="mango-kpi-conversion" class="text-emerald-700 font-bold">0%</strong>
+          </div>
+        </div>
+
+        <!-- Monto Total Prometido -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Monto Prometido Total</span>
+            <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+          </div>
+          <div id="mango-kpi-monto" class="text-3xl font-black text-slate-800 mt-2">$0</div>
+          <div class="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
+            <span>Ticket Promedio:</span>
+            <strong id="mango-kpi-ticket" class="text-slate-700 font-bold">$0</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- MÓDULO DE AUDITORÍA & CALIDAD DE DATOS (EN QUÉ MEJORAR) -->
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm">
+                <i class="fas fa-stethoscope"></i>
+              </div>
+              <h3 class="text-sm font-bold text-slate-800">Diagnóstico de Calidad de Datos & Auditoría de Operadores</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Alertas automáticas sobre qué corregir: notas escuetas, promesas sin monto, quema de base o cuentas desatendidas.</p>
+          </div>
+
+          <!-- Score de Salud de Datos -->
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <span class="text-[10px] text-slate-400 uppercase font-bold block">Score de Salud</span>
+              <span id="mango-auditoria-score" class="text-xl font-black text-slate-800">100/100</span>
+            </div>
+            <div class="w-32 bg-slate-100 rounded-full h-3 overflow-hidden">
+              <div id="mango-auditoria-score-bar" class="bg-emerald-500 h-3 rounded-full transition-all duration-500" style="width: 100%"></div>
+            </div>
+            <div id="mango-auditoria-score-badge"></div>
+          </div>
+        </div>
+
+        <!-- Lista de Alertas Inteligentes -->
+        <div id="mango-auditoria-alertas-lista" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <!-- Alertas dinámicas -->
+        </div>
+      </div>
+
+      <!-- Gráficos de Productividad -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Gráfico Comparativo Operadores (2 cols) -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-chart-column text-blue-600"></i>
+              <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Gestiones vs Promesas por Operador</h4>
+            </div>
+            <span class="text-[11px] text-slate-400">Top 10 en actividad</span>
+          </div>
+          <div class="h-72 relative">
+            <canvas id="mango-chart-operadores"></canvas>
+          </div>
+        </div>
+
+        <!-- Canales y Tipificaciones (1 col) -->
+        <div class="space-y-6">
+          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-chart-pie text-emerald-600"></i>
+                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Canales de Contacto</h4>
+              </div>
+            </div>
+            <div class="h-44 relative">
+              <canvas id="mango-chart-canales"></canvas>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-tags text-purple-600"></i>
+                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Tipificaciones Principales</h4>
+              </div>
+            </div>
+            <div class="h-44 relative">
+              <canvas id="mango-chart-resultados"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla Ranking de Operadores -->
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/70">
+          <div>
+            <div class="flex items-center gap-2">
+              <i class="fas fa-trophy text-amber-500"></i>
+              <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Ranking y Métricas por Operador</h4>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Haz clic en <strong>"Ver DNIs"</strong> para auditar cada DNI trabajado por el cobrador.</p>
+          </div>
+          <button id="btn-mango-exportar-operadores" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm">
+            <i class="fas fa-file-excel"></i> Exportar Ranking a Excel
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3 text-center">#</th>
+                <th class="px-4 py-3">Operador</th>
+                <th class="px-4 py-3 text-center">Gestiones</th>
+                <th class="px-4 py-3 text-center">DNIs Únicos</th>
+                <th class="px-4 py-3 text-center">DNIs/Día (Meta: 60)</th>
+                <th class="px-4 py-3 text-center">% Contacto</th>
+                <th class="px-4 py-3 text-center">Promesas</th>
+                <th class="px-4 py-3 text-right">Monto Prometido</th>
+                <th class="px-4 py-3 text-center">Calidad Datos</th>
+                <th class="px-4 py-3 text-center">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="mango-tabla-operadores-tbody">
+              <!-- Filas generadas por mango_analyzer.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- FICHA DETALLADA DEL OPERADOR Y TRAZABILIDAD DE DNIs -->
+      <!-- ========================================================= -->
+      <div id="mango-seccion-operador-detalle" class="bg-white rounded-3xl border-2 border-blue-500/30 shadow-xl overflow-hidden space-y-5 p-6">
+        
+        <!-- Header del Operador -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-xl shadow-md">
+              <i class="fas fa-user-gear"></i>
+            </div>
+            <div>
+              <span class="text-[10px] text-blue-600 font-bold uppercase tracking-wider">Ficha de Auditoría Individual</span>
+              <h3 class="text-lg font-black text-slate-800">
+                <span id="mango-op-nombre-header">Selecciona un operador</span>
+              </h3>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <label class="text-xs font-semibold text-slate-600 hidden sm:inline">Cambiar Operador:</label>
+            <select id="mango-selector-op-detalle" class="p-2.5 bg-slate-50 border rounded-xl text-xs font-bold text-slate-800 focus:ring-2 focus:ring-blue-500">
+              <!-- Opciones dinámicas -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Mini KPIs del Operador -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-center text-xs">
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <span class="text-[10px] text-slate-400 block font-semibold">Gestiones</span>
+            <strong id="mango-op-kpi-gestiones" class="text-sm text-blue-600 font-black">0</strong>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <span class="text-[10px] text-slate-400 block font-semibold">DNIs Tocados</span>
+            <strong id="mango-op-kpi-dnis" class="text-sm text-purple-600 font-black">0</strong>
+          </div>
+          <div class="p-3 bg-purple-50/60 rounded-xl border border-purple-100">
+            <span class="text-[10px] text-purple-600 block font-semibold">DNIs / Día (Meta: 60)</span>
+            <strong id="mango-op-kpi-dnis-dia" class="text-xs text-purple-800 font-black">0 / día</strong>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <span class="text-[10px] text-slate-400 block font-semibold">Intensidad</span>
+            <strong id="mango-op-kpi-intensidad" class="text-sm text-slate-700 font-black">0</strong>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <span class="text-[10px] text-slate-400 block font-semibold">% Contacto</span>
+            <strong id="mango-op-kpi-contactabilidad" class="text-sm text-slate-800 font-black">0%</strong>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <span class="text-[10px] text-slate-400 block font-semibold">Promesas</span>
+            <strong id="mango-op-kpi-promesas" class="text-sm text-emerald-600 font-black">0</strong>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <span class="text-[10px] text-slate-400 block font-semibold">Conversión</span>
+            <strong id="mango-op-kpi-conversion" class="text-sm text-emerald-700 font-black">0%</strong>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 col-span-2 sm:col-span-1">
+            <span class="text-[10px] text-slate-400 block font-semibold">Monto Prometido</span>
+            <strong id="mango-op-kpi-monto" class="text-sm text-slate-900 font-black">$0</strong>
+          </div>
+        </div>
+
+        <!-- Diagnóstico Individual de Mejora para el Operador -->
+        <div id="mango-op-diagnostico-container">
+          <!-- Tarjetas de mejora individual -->
+        </div>
+
+        <!-- Tabla de DNIs Tocados por este Operador -->
+        <div class="border border-slate-200 rounded-2xl overflow-hidden mt-4">
+          <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <i class="fas fa-list-numeric text-blue-600"></i>
+                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Listado de DNIs Tocados por este Operador</h4>
+                <span id="mango-op-dnis-count-badge" class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold text-xs">0 DNIs</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Haz clic en cualquier DNI para ver su trazabilidad o en "Mango" para abrir la gestión web directa.</p>
+            </div>
+
+            <!-- Filtros y Exportación de DNIs -->
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="relative">
+                <i class="fas fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="mango-op-buscar-dni" placeholder="Filtrar por DNI o Titular..." 
+                       class="pl-8 pr-3 py-1.5 bg-white border rounded-xl text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 w-48 sm:w-56" />
+              </div>
+
+              <select id="mango-op-filtro-resultado" class="p-1.5 bg-white border rounded-xl text-xs text-slate-700 font-medium focus:ring-2 focus:ring-blue-500">
+                <option value="TODOS">Todos los Resultados</option>
+                <option value="ACUERDOS_SIN_PAGO">⭐ Acuerdos sin Pago a Imputar (Cuotas Pendientes)</option>
+                <option value="SIN_PAGO_IMPUTAR">Sin Pago a Imputar (No Abonados)</option>
+                <option value="CON_PAGO_IMPUTAR">Con Pago a Imputar (Abonados)</option>
+                <option value="PROMESAS">Solo Promesas de Pago</option>
+                <option value="CONTACTADOS">Solo Contactados</option>
+                <option value="NO_CONTACTADOS">Solo Sin Contacto / Ocupado</option>
+              </select>
+
+              <button id="btn-mango-exportar-dnis-op" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1 shadow-sm">
+                <i class="fas fa-file-excel"></i> Exportar DNIs
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto max-h-96">
+            <table class="w-full text-left">
+              <thead class="bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider sticky top-0 border-b">
+                <tr>
+                  <th class="px-3 py-2.5">DNI</th>
+                  <th class="px-3 py-2.5">Titular</th>
+                  <th class="px-3 py-2.5">Cartera</th>
+                  <th class="px-3 py-2.5 text-center">Toques</th>
+                  <th class="px-3 py-2.5">Último Resultado</th>
+                  <th class="px-3 py-2.5 text-center">Estado Pago</th>
+                  <th class="px-3 py-2.5 text-center">Vencimiento</th>
+                  <th class="px-3 py-2.5 text-right">Monto Promesa</th>
+                  <th class="px-3 py-2.5">Última Observación</th>
+                  <th class="px-3 py-2.5 text-center">CRM Mango</th>
+                </tr>
+              </thead>
+              <tbody id="mango-tabla-dnis-op-tbody">
+                <!-- Filas de DNIs del operador -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Modal de Trazabilidad Universal de DNI -->
+    <div id="mango-modal-trazabilidad-dni" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+      <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200">
+        <div class="flex items-center justify-between border-b pb-3 mb-4">
+          <div class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <i class="fas fa-timeline"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800">Trazabilidad Cronológica de DNI</h3>
+              <p class="text-xs text-slate-400">Historial completo de intentos, canales y operadores para este deudor</p>
+            </div>
+          </div>
+          <button onclick="document.getElementById('mango-modal-trazabilidad-dni').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 text-lg">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div id="mango-trazabilidad-dni-resultado">
+          <!-- Contenido dinámico del DNI -->
+        </div>
+
+        <div class="mt-4 pt-3 border-t flex justify-end">
+          <button type="button" onclick="document.getElementById('mango-modal-trazabilidad-dni').classList.add('hidden')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Detalle de Gestiones a Mejorar (Auditoría / Diagnóstico) -->
+    <div id="mango-modal-auditoria-detalle" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+      <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+        
+        <!-- Header del Modal -->
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/50">
+          <div class="flex items-center gap-3">
+            <div id="mango-auditoria-modal-icono" class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg bg-rose-100 text-rose-600">
+              <i class="fas fa-triangle-exclamation"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 id="mango-auditoria-modal-titulo" class="text-sm font-black text-slate-800">Gestiones a Mejorar</h3>
+                <span id="mango-auditoria-modal-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-700">0 casos</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">Listado detallado de registros que requieren corrección o seguimiento de supervisión</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="MangoAnalyzerModule.exportarCasosAuditoria()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all">
+              <i class="fas fa-file-excel"></i>
+              <span>Exportar a Excel</span>
+            </button>
+            <button onclick="document.getElementById('mango-modal-auditoria-detalle').classList.add('hidden')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition-colors">
+              <i class="fas fa-times text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Banner de Recomendación & Coaching -->
+        <div id="mango-auditoria-modal-recomendacion" class="p-4 pb-0 shrink-0">
+          <!-- Dinámico -->
+        </div>
+
+        <!-- Barra de Búsqueda y Filtro de Casos -->
+        <div class="p-4 pb-2 flex flex-wrap items-center justify-between gap-3 shrink-0">
+          <div class="relative flex-1 min-w-[240px]">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="mango-auditoria-modal-buscar" placeholder="Buscar por DNI, Titular u Operador..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-medium focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all" />
+          </div>
+          <div id="mango-auditoria-modal-contador" class="text-xs text-slate-400 font-medium"></div>
+        </div>
+
+        <!-- Contenedor Scrollable de la Tabla -->
+        <div class="p-4 pt-2 overflow-y-auto flex-1">
+          <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="bg-slate-50 text-slate-500 font-bold border-b text-[11px] sticky top-0 z-10 uppercase tracking-wider">
+                <tr>
+                  <th class="p-3">DNI</th>
+                  <th class="p-3">Titular</th>
+                  <th class="p-3">Operador</th>
+                  <th class="p-3">Fecha Gestión</th>
+                  <th class="p-3">Canal</th>
+                  <th class="p-3">Resultado</th>
+                  <th class="p-3 text-center">Vencimiento Acuerdo</th>
+                  <th class="p-3">Observación Registrada</th>
+                  <th class="p-3 text-center">Monto</th>
+                  <th class="p-3 text-center">Mango CRM</th>
+                </tr>
+              </thead>
+              <tbody id="mango-auditoria-modal-tbody" class="divide-y divide-slate-100">
+                <!-- Filas dinámicas -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Footer del Modal -->
+        <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between shrink-0">
+          <p class="text-[11px] text-slate-400">
+            <i class="fas fa-shield-halved mr-1"></i> Auditoría Operativa CobranzasPro & Mango CRM
+          </p>
+          <button type="button" onclick="document.getElementById('mango-modal-auditoria-detalle').classList.add('hidden')" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition-colors">
+            Cerrar
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Script del Motor de Análisis con Cache-Buster -->
+  <script src="js/mango_analyzer.js?v=20260923_v8"></script>
+  <script>
+    // Garantizar que los datepickers jamás tengan min o max bloqueando el calendario
+    function desbloquearCalendarios() {
+      ['mango-filtro-fecha-desde', 'mango-filtro-fecha-hasta'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) { el.removeAttribute('min'); el.removeAttribute('max'); }
+      });
+    }
+    desbloquearCalendarios();
+    document.addEventListener('DOMContentLoaded', () => {
+      desbloquearCalendarios();
+      MangoAnalyzerModule.init();
+    });
+    window.addEventListener('load', desbloquearCalendarios);
+  </script>
+</body>
+</html>
