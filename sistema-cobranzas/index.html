@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CobranzasPro - Plataforma de Gestión y Monitoreo de Cobranzas</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- SheetJS para procesar Excel (.xlsx, .xls) de CRM Mango -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <!-- Estilos Personalizados -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-slate-50 min-h-screen selection:bg-blue-500 selection:text-white">
+
+  <!-- ========================================== -->
+  <!-- VISTA DE LOGIN CORPORATIVO -->
+  <!-- ========================================== -->
+  <div id="view-login" class="min-h-screen bg-slate-950 flex flex-col justify-center items-center p-4 relative overflow-hidden">
+    <!-- Fondo decorativo -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-blue-600/10 blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-indigo-600/10 blur-3xl"></div>
+    </div>
+
+    <div class="max-w-md w-full relative z-10 space-y-6">
+      <!-- Logo y Título -->
+      <div class="text-center space-y-2">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-xl shadow-blue-500/20 mx-auto">
+          <i class="fas fa-hand-holding-dollar text-3xl text-white"></i>
+        </div>
+        <h1 class="text-2xl font-black text-white tracking-tight">Cobranzas<span class="text-blue-400">Pro</span></h1>
+        <p class="text-xs text-slate-400">Plataforma Integral de Recupero Crediticio & Gestión de Cartera</p>
+      </div>
+
+      <!-- Tarjeta Formulario de Login -->
+      <div class="bg-slate-900/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl space-y-5">
+        <div class="border-b border-slate-800 pb-3">
+          <h2 class="text-sm font-bold text-white uppercase tracking-wider">Iniciar Sesión</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Ingresa tu usuario formato <code class="text-blue-400 font-mono">nombre.apellido</code></p>
+        </div>
+
+        <form id="form-login" class="space-y-4 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1.5">Usuario (nombre.apellido)</label>
+            <div class="relative">
+              <i class="fas fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"></i>
+              <input type="text" id="login-usuario" required placeholder="ej: roberto.valdez o carlos.martinez" 
+                     class="w-full pl-10 pr-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-xs placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1.5">Contraseña</label>
+            <div class="relative">
+              <i class="fas fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"></i>
+              <input type="password" id="login-password" required placeholder="Contraseña (123)" 
+                     class="w-full pl-10 pr-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-xs placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2 text-xs">
+            <i class="fas fa-arrow-right-to-bracket"></i> Ingresar al Sistema
+          </button>
+        </form>
+
+        <!-- Accesos Rápidos Demo (1 Clic) -->
+        <div class="pt-4 border-t border-slate-800 space-y-2">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block text-center">
+            O ingresa con 1 clic para probar cada rol:
+          </span>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" class="btn-login-rapido text-left p-2.5 rounded-xl bg-slate-800/70 hover:bg-slate-800 border border-slate-700/60 transition-all group" data-role="gerente">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                <span class="font-bold text-white text-xs group-hover:text-blue-400">Gerente</span>
+              </div>
+              <div class="text-[10px] text-slate-400 font-mono mt-0.5">roberto.valdez</div>
+            </button>
+
+            <button type="button" class="btn-login-rapido text-left p-2.5 rounded-xl bg-slate-800/70 hover:bg-slate-800 border border-slate-700/60 transition-all group" data-role="supervisor">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                <span class="font-bold text-white text-xs group-hover:text-blue-400">Supervisor</span>
+              </div>
+              <div class="text-[10px] text-slate-400 font-mono mt-0.5">laura.menendez</div>
+            </button>
+
+            <button type="button" class="btn-login-rapido text-left p-2.5 rounded-xl bg-slate-800/70 hover:bg-slate-800 border border-slate-700/60 transition-all group" data-role="operador">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span class="font-bold text-white text-xs group-hover:text-blue-400">Operador</span>
+              </div>
+              <div class="text-[10px] text-slate-400 font-mono mt-0.5">carlos.martinez</div>
+            </button>
+
+            <button type="button" class="btn-login-rapido text-left p-2.5 rounded-xl bg-slate-800/70 hover:bg-slate-800 border border-slate-700/60 transition-all group" data-role="backoffice">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                <span class="font-bold text-white text-xs group-hover:text-blue-400">Backoffice</span>
+              </div>
+              <div class="text-[10px] text-slate-400 font-mono mt-0.5">marcos.cesare</div>
+            </button>
+          </div>
+          <div class="text-center text-[10px] text-slate-500 pt-1">
+            Contraseña estándar de prueba: <strong class="text-slate-400">123</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- APLICACIÓN PRINCIPAL (APP SHELL) -->
+  <!-- ========================================== -->
+  <div id="app-shell" class="hidden min-h-screen flex flex-col">
+
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+    <header class="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-40 shadow-md">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <!-- Logo y Nombre de la Empresa -->
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
+              <i class="fas fa-hand-holding-dollar text-xl text-white"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h1 class="font-extrabold text-lg tracking-tight">Cobranzas<span class="text-blue-400">Pro</span></h1>
+                <span class="text-[10px] bg-blue-500/20 text-blue-300 font-bold px-2 py-0.5 rounded-full border border-blue-400/30">v2.6</span>
+              </div>
+              <p class="text-[11px] text-slate-400">Sistema de Recupero & Supervisión de Operadores</p>
+            </div>
+          </div>
+
+          <!-- Perfil de Usuario Conectado y Salir -->
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2.5 px-3 py-1.5 bg-slate-800/80 rounded-xl border border-slate-700/60 text-xs">
+              <img id="header-user-avatar" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150" class="w-7 h-7 rounded-full object-cover border border-slate-600" />
+              <div class="hidden sm:block text-left">
+                <div class="flex items-center gap-1.5">
+                  <strong id="header-user-nombre" class="text-white font-bold leading-tight">Cargando...</strong>
+                  <span id="header-user-badge"></span>
+                </div>
+                <div id="header-user-login" class="text-[10px] text-slate-400 font-mono">@usuario</div>
+              </div>
+            </div>
+
+            <button id="btn-reset-demo-data" title="Restablecer datos de prueba" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 border border-slate-700">
+              <i class="fas fa-rotate-right text-[11px]"></i>
+              <span class="hidden md:inline">Reiniciar Demo</span>
+            </button>
+
+            <button id="btn-logout" title="Cerrar Sesión" class="px-3 py-1.5 bg-rose-600/90 hover:bg-rose-600 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm">
+              <i class="fas fa-sign-out-alt"></i>
+              <span class="hidden sm:inline">Salir</span>
+            </button>
+          </div>
+        </div>
+
+      <!-- PESTAÑAS DE NAVEGACIÓN -->
+      <nav class="flex space-x-1 sm:space-x-2 overflow-x-auto border-t border-slate-800/80 py-2">
+        <button data-tab="dashboard" class="nav-tab-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-300 hover:text-white flex items-center gap-2 whitespace-nowrap">
+          <i class="fas fa-chart-pie"></i>
+          <span>Dashboard General</span>
+        </button>
+
+        <button data-tab="titulares" class="nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-300 hover:text-white flex items-center gap-2 whitespace-nowrap">
+          <i class="fas fa-users-viewfinder"></i>
+          <span>Titulares y Cobranzas</span>
+        </button>
+
+        <button data-tab="operaciones" class="nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-300 hover:text-white flex items-center gap-2 whitespace-nowrap">
+          <i class="fas fa-layer-group"></i>
+          <span>Operaciones (Cargas Masivas)</span>
+        </button>
+
+        <button data-tab="reportes" class="nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-300 hover:text-white flex items-center gap-2 whitespace-nowrap">
+          <i class="fas fa-file-invoice-dollar"></i>
+          <span>Reportes y Estadísticas</span>
+        </button>
+
+        <button data-tab="operadores" class="nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-300 hover:text-white flex items-center gap-2 whitespace-nowrap">
+          <i class="fas fa-headset"></i>
+          <span>Monitoreo de Operadores</span>
+        </button>
+
+        <button data-tab="mango" class="nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-300 hover:text-white flex items-center gap-2 whitespace-nowrap bg-emerald-950/40 border border-emerald-500/30">
+          <i class="fas fa-file-excel text-emerald-400"></i>
+          <span class="text-emerald-300 font-bold">Analizador Mango CRM</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL DE LAS PESTAÑAS -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- Banner Personalizado de Rol Operador -->
+    <div id="operador-personal-banner" class="hidden mb-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-lg">
+          <i class="fas fa-headset"></i>
+        </div>
+        <div>
+          <h2 class="text-sm font-bold">Panel Operativo de Cobranzas — <span id="op-banner-nombre">Operador</span></h2>
+          <p class="text-xs text-emerald-100">Estás en modo gestión directa: busca titulares, revisa deudas exigibles, acuerda compromisos y registra pagos.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 text-xs">
+        <span class="px-3 py-1 bg-white/20 rounded-lg font-semibold">
+          <i class="fas fa-check-circle mr-1"></i> Sesión Activa
+        </span>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- 1. PESTAÑA: DASHBOARD GENERAL -->
+    <!-- ============================================================= -->
+    <section id="tab-dashboard" class="tab-pane active space-y-6">
+      <!-- Tarjetas de KPIs Principales -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Deuda Gestionada -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Cartera en Mora</span>
+            <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+              <i class="fas fa-money-bill-wave text-lg"></i>
+            </div>
+          </div>
+          <div id="kpi-total-deuda" class="text-2xl font-extrabold text-slate-900 mt-2">$ 0</div>
+          <div class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+            <i class="fas fa-shield-alt text-blue-500"></i> Cartera bajo gestión activa
+          </div>
+        </div>
+
+        <!-- Total Recuperado -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Monto Recuperado</span>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i class="fas fa-hand-holding-dollar text-lg"></i>
+            </div>
+          </div>
+          <div id="kpi-total-cobrado" class="text-2xl font-extrabold text-emerald-600 mt-2">$ 0</div>
+          <div class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+            <i class="fas fa-check-circle text-emerald-500"></i> Cobranzas acreditadas
+          </div>
+        </div>
+
+        <!-- Efectividad de Promesas -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Efectividad Promesas</span>
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <i class="fas fa-calendar-check text-lg"></i>
+            </div>
+          </div>
+          <div id="kpi-efectividad" class="text-2xl font-extrabold text-blue-600 mt-2">0%</div>
+          <div class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+            <i class="fas fa-arrow-trend-up text-blue-500"></i> Compromisos cumplidos vs caídos
+          </div>
+        </div>
+
+        <!-- Operadores en Línea -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Operadores Activos</span>
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+              <i class="fas fa-headset text-lg"></i>
+            </div>
+          </div>
+          <div id="kpi-operadores-activos" class="text-2xl font-extrabold text-slate-900 mt-2">0 / 0</div>
+          <div class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> Monitoreo en vivo disponible
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Meta Mensual Global -->
+      <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white p-6 rounded-2xl shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+          <div>
+            <h3 class="text-base font-bold">Avance de Recaudación Mensual</h3>
+            <p class="text-xs text-indigo-200">Objetivo colectivo asignado al equipo de operadores</p>
+          </div>
+          <span id="dash-meta-texto" class="text-xs font-bold bg-white/10 px-3 py-1.5 rounded-lg">0% de la meta</span>
+        </div>
+        <div class="w-full bg-white/10 rounded-full h-3.5 overflow-hidden p-0.5 border border-white/10">
+          <div id="dash-meta-barra" class="h-full bg-gradient-to-r from-emerald-400 to-teal-300 rounded-full transition-all duration-700" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Alertas y Accesos Rápidos -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Alertas de Promesas y Casos Críticos -->
+        <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-bell text-amber-500"></i>
+              <h3 class="font-bold text-slate-800 text-sm">Alertas y Compromisos Clave de Hoy</h3>
+            </div>
+            <span class="text-xs text-slate-400">Seguimiento prioritario</span>
+          </div>
+          <div id="dash-alertas-container" class="space-y-2">
+            <!-- Cargado dinámicamente -->
+          </div>
+        </div>
+
+        <!-- Atajos Rápidos -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+            <i class="fas fa-bolt text-blue-600"></i> Acciones Rápidas
+          </h3>
+
+          <button onclick="App.switchTab('titulares')" class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-700 transition-colors border border-slate-100 flex items-center justify-between group">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                <i class="fas fa-search text-xs"></i>
+              </div>
+              <div>
+                <div class="font-bold text-xs">Buscar Titulares a Cobrar</div>
+                <div class="text-[11px] text-slate-400">Accede a fichas y gestión de mora</div>
+              </div>
+            </div>
+            <i class="fas fa-chevron-right text-xs text-slate-400 group-hover:translate-x-1 transition-transform"></i>
+          </button>
+
+          <button onclick="App.switchTab('reportes')" class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-700 transition-colors border border-slate-100 flex items-center justify-between group">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                <i class="fas fa-file-excel text-xs"></i>
+              </div>
+              <div>
+                <div class="font-bold text-xs">Generar Reporte de Recaudación</div>
+                <div class="text-[11px] text-slate-400">Exportar pagos a Excel / CSV</div>
+              </div>
+            </div>
+            <i class="fas fa-chevron-right text-xs text-slate-400 group-hover:translate-x-1 transition-transform"></i>
+          </button>
+
+          <button onclick="App.switchTab('operadores')" class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-700 transition-colors border border-slate-100 flex items-center justify-between group">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                <i class="fas fa-users text-xs"></i>
+              </div>
+              <div>
+                <div class="font-bold text-xs">Monitorear Operadores</div>
+                <div class="text-[11px] text-slate-400">Supervisa llamadas y estados en vivo</div>
+              </div>
+            </div>
+            <i class="fas fa-chevron-right text-xs text-slate-400 group-hover:translate-x-1 transition-transform"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 2. PESTAÑA: TITULARES Y COBRANZAS -->
+    <!-- ============================================================= -->
+    <section id="tab-titulares" class="tab-pane space-y-4">
+      <!-- Barra Superior de Búsqueda y Filtros -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <!-- Input de Búsqueda -->
+          <div class="md:col-span-2 relative">
+            <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="search-titular" placeholder="Buscar por Nombre, DNI/CUIT, Teléfono o N° Cuenta..." 
+                   class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+          </div>
+
+          <!-- Filtro de Tramo de Mora -->
+          <div>
+            <select id="filter-mora" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="todos">Todos los Tramos de Mora</option>
+              <option value="al_dia">Al Día (0 días)</option>
+              <option value="mora_1_30">Mora 1 - 30 días</option>
+              <option value="mora_31_60">Mora 31 - 60 días</option>
+              <option value="mora_61_90">Mora 61 - 90 días</option>
+              <option value="judicial">Judicial (+90 días)</option>
+            </select>
+          </div>
+
+          <!-- Filtro de Operador -->
+          <div>
+            <select id="filter-operador" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="todos">Todos los Operadores</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100">
+          <span id="contador-titulares" class="font-medium text-slate-600">Cargando titulares...</span>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400">Filtro de Gestión:</span>
+            <select id="filter-gestion" class="text-xs bg-transparent border-none font-semibold text-blue-600 focus:ring-0 cursor-pointer">
+              <option value="todos">Cualquier estado</option>
+              <option value="compromiso_pago">Con Compromiso de Pago</option>
+              <option value="sin_gestion">Sin Gestión</option>
+              <option value="no_contesta">No Contesta</option>
+              <option value="negativa">Negativa</option>
+              <option value="acuerdo">Acuerdo / Al Día</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Distribución Dividida: Lista de Titulares a la Izquierda | Ficha a la Derecha -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Lista de Titulares (5 columnas en desktop) -->
+        <div class="lg:col-span-5 max-h-[780px] overflow-y-auto pr-1" id="lista-titulares">
+          <!-- Renderizado dinámico de tarjetas -->
+        </div>
+
+        <!-- Ficha del Titular Seleccionado (7 columnas en desktop) -->
+        <div class="lg:col-span-7" id="detalle-titular">
+          <!-- Renderizado dinámico de la ficha completa -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 3. PESTAÑA: OPERACIONES (CARGAS MASIVAS Y PROCESAMIENTO) -->
+    <!-- ============================================================= -->
+    <section id="tab-operaciones" class="tab-pane space-y-6">
+      <!-- Cabecera de Operaciones -->
+      <div class="bg-gradient-to-r from-slate-900 to-blue-950 text-white p-6 rounded-2xl shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-lg font-bold">Centro de Operaciones y Cargas Masivas</h2>
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-xs font-bold border border-blue-400/30">
+                Lotes & Excel
+              </span>
+            </div>
+            <p class="text-xs text-blue-200 mt-1">
+              Importa o actualiza datos por lote: stock de deudores, gestiones telefónicas masivas, teléfonos de contacto, correos y datos de empleo.
+            </p>
+          </div>
+        </div>
+
+        <!-- Submenú de las 6 opciones de operaciones masivas y usuarios -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mt-5 pt-4 border-t border-blue-900/60 text-xs">
+          <button data-operacion="stock" class="btn-sub-operacion p-3 rounded-xl font-bold flex flex-col items-center gap-2 transition-all bg-blue-600 text-white shadow-sm">
+            <i class="fas fa-boxes-stacked text-base"></i>
+            <span>Stock Carteras</span>
+          </button>
+          <button data-operacion="gestiones" class="btn-sub-operacion p-3 rounded-xl font-bold flex flex-col items-center gap-2 transition-all bg-white text-slate-600 border border-slate-200 hover:bg-blue-50">
+            <i class="fas fa-headset text-base"></i>
+            <span>Gestiones Masivas</span>
+          </button>
+          <button data-operacion="telefonos" class="btn-sub-operacion p-3 rounded-xl font-bold flex flex-col items-center gap-2 transition-all bg-white text-slate-600 border border-slate-200 hover:bg-blue-50">
+            <i class="fas fa-phone-volume text-base"></i>
+            <span>Carga Teléfonos</span>
+          </button>
+          <button data-operacion="mails" class="btn-sub-operacion p-3 rounded-xl font-bold flex flex-col items-center gap-2 transition-all bg-white text-slate-600 border border-slate-200 hover:bg-blue-50">
+            <i class="fas fa-envelope-open-text text-base"></i>
+            <span>Carga Mails</span>
+          </button>
+          <button data-operacion="laborales" class="btn-sub-operacion p-3 rounded-xl font-bold flex flex-col items-center gap-2 transition-all bg-white text-slate-600 border border-slate-200 hover:bg-blue-50">
+            <i class="fas fa-briefcase text-base"></i>
+            <span>Datos Laborales</span>
+          </button>
+          <button data-operacion="usuarios" class="btn-sub-operacion p-3 rounded-xl font-bold flex flex-col items-center gap-2 transition-all bg-white text-slate-600 border border-slate-200 hover:bg-blue-50">
+            <i class="fas fa-users-gear text-base"></i>
+            <span>Gestión Usuarios</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- PANEL 1: Cargas Masivas por Lotes (CSV/Excel) -->
+      <div id="op-panel-lotes" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b pb-4">
+          <div>
+            <h3 id="op-modulo-titulo" class="text-base font-bold text-slate-800">Carga de Stock de Carteras</h3>
+            <p id="op-modulo-desc" class="text-xs text-slate-500 mt-0.5">Importa nuevos titulares o actualiza deudas existentes en la cartera activa.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btn-cargar-ejemplo" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors">
+              <i class="fas fa-wand-magic-sparkles text-blue-500"></i> Cargar Ejemplo
+            </button>
+            <button id="btn-descargar-plantilla" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-colors">
+              <i class="fas fa-file-csv"></i> Descargar Plantilla CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- Columnas esperadas -->
+        <div>
+          <label class="block text-[11px] font-bold uppercase text-slate-400 mb-2">Columnas requeridas para esta operación:</label>
+          <div id="op-modulo-columnas" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <!-- Área de Carga / Pegado -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-slate-700">Pegar celdas copiadas de Excel o texto CSV:</label>
+            <label class="text-xs text-blue-600 font-semibold cursor-pointer hover:underline flex items-center gap-1">
+              <i class="fas fa-folder-open"></i> O subir archivo CSV
+              <input type="file" id="input-archivo-csv" accept=".csv, .txt" class="hidden">
+            </label>
+          </div>
+          <textarea id="textarea-datos-masivos" rows="6" placeholder="Pega aquí los datos copiados de Excel (filas y columnas) o un archivo de texto separado por comas o punto y coma..." class="w-full p-3 font-mono text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+          
+          <div class="flex justify-between items-center pt-2">
+            <span class="text-[11px] text-slate-400">
+              <i class="fas fa-info-circle mr-1"></i> Detecta automáticamente separador por tabulación (Excel), coma o punto y coma.
+            </span>
+            <button id="btn-analizar-datos" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm flex items-center gap-2 transition-colors">
+              <i class="fas fa-table-list"></i> Analizar y Previsualizar Datos
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL 2: Gestión de Usuarios del Sistema (CRUD) -->
+      <div id="op-panel-usuarios" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
+          <div>
+            <h3 class="text-base font-bold text-slate-800">Administración de Usuarios y Accesos</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Usuarios tipo <code class="text-blue-600 font-mono font-bold">nombre.apellido</code> con asignación de roles (Gerente, Supervisor, Operador, Backoffice).</p>
+          </div>
+          <button onclick="OperacionesModule.abrirModalCrearUsuario()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm flex items-center gap-2 self-start sm:self-auto transition-colors">
+            <i class="fas fa-user-plus"></i> Crear Nuevo Usuario
+          </button>
+        </div>
+
+        <!-- Buscador de Usuarios -->
+        <div class="flex items-center justify-between gap-4">
+          <div class="relative flex-1 max-w-sm">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="search-usuarios" placeholder="Filtrar por nombre, usuario o rol..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none">
+          </div>
+          <span id="contador-usuarios" class="text-xs text-slate-500 font-medium"></span>
+        </div>
+
+        <!-- Tabla de Usuarios Registrados -->
+        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+          <table class="w-full text-left">
+            <thead class="bg-slate-50 border-b text-xs font-semibold text-slate-600">
+              <tr>
+                <th class="p-3">Nombre Completo</th>
+                <th class="p-3">Usuario (Login)</th>
+                <th class="p-3">Rol Asignado</th>
+                <th class="p-3">Contraseña</th>
+                <th class="p-3">Estado</th>
+                <th class="p-3 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-usuarios-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Contenedor de Previsualización y Confirmación -->
+      <div id="op-preview-container" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden space-y-4 p-5">
+        <div class="flex items-center justify-between border-b pb-3">
+          <div class="flex items-center gap-3">
+            <h3 class="font-bold text-slate-800 text-sm">Previsualización de Registros a Importar</h3>
+            <span id="op-preview-count" class="badge badge-blue text-xs font-bold">0 registros listos</span>
+          </div>
+          <button id="btn-confirmar-importacion" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold shadow-md flex items-center gap-2 transition-all">
+            <i class="fas fa-check-double"></i> Confirmar e Importar al Sistema
+          </button>
+        </div>
+
+        <div class="overflow-x-auto border rounded-xl">
+          <table class="w-full text-left">
+            <thead id="op-preview-thead"></thead>
+            <tbody id="op-preview-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 4. PESTAÑA: REPORTES Y ESTADÍSTICAS -->
+    <!-- ============================================================= -->
+    <section id="tab-reportes" class="tab-pane space-y-6">
+      <!-- Selector de Tipo de Reporte y Rango de Fechas -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-3">
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1">Tipo de Reporte</label>
+            <select id="reporte-tipo" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="recaudacion">Reporte de Recaudación y Cobros</option>
+              <option value="promesas">Reporte de Compromisos y Promesas</option>
+              <option value="aging">Reporte de Cartera por Antigüedad (Aging)</option>
+              <option value="operadores">Reporte de Rendimiento por Operador</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1">Periodo</label>
+            <select id="reporte-rango" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="mes">Este Mes</option>
+              <option value="semana">Esta Semana</option>
+              <option value="hoy">Hoy</option>
+              <option value="todos">Todo el Histórico</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="btn-exportar-csv" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2 shadow-sm">
+            <i class="fas fa-file-excel"></i> Exportar a Excel (CSV)
+          </button>
+          <button id="btn-imprimir-reporte" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2 shadow-sm">
+            <i class="fas fa-print"></i> Imprimir / PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Resumen de Métricas del Reporte -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+          <span class="text-[11px] font-semibold text-slate-400 uppercase">Total Recaudado</span>
+          <div id="rep-kpi-recaudado" class="text-xl font-extrabold text-emerald-600 mt-1">$ 0</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+          <span class="text-[11px] font-semibold text-slate-400 uppercase">Total Cartera Activa</span>
+          <div id="rep-kpi-deuda" class="text-xl font-extrabold text-slate-800 mt-1">$ 0</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+          <span class="text-[11px] font-semibold text-slate-400 uppercase">% Cumplimiento Promesas</span>
+          <div id="rep-kpi-efectividad" class="text-xl font-extrabold text-blue-600 mt-1">0%</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+          <span class="text-[11px] font-semibold text-slate-400 uppercase">Transacciones de Cobro</span>
+          <div id="rep-kpi-pagos" class="text-xl font-extrabold text-indigo-600 mt-1">0</div>
+        </div>
+      </div>
+
+      <!-- Gráficos de Reportes -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+            <i class="fas fa-chart-column text-blue-500"></i> Recaudación por Canal de Cobro
+          </h4>
+          <div class="h-64 relative">
+            <canvas id="chart-recaudacion-canvas"></canvas>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+            <i class="fas fa-chart-pie text-indigo-500"></i> Cartera por Tramo de Mora (Aging)
+          </h4>
+          <div class="h-64 relative">
+            <canvas id="chart-mora-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla Detallada del Reporte -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+          <h3 id="reporte-tabla-titulo" class="font-bold text-slate-800 text-sm">Detalle del Reporte</h3>
+          <span class="text-xs text-slate-400">Datos consolidados del sistema</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead id="reporte-tabla-head"></thead>
+            <tbody id="reporte-tabla-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 4. PESTAÑA: MONITOREO DE OPERADORES (SUPERVISIÓN) -->
+    <!-- ============================================================= -->
+    <section id="tab-operadores" class="tab-pane space-y-6">
+      <!-- Barra Superior de Supervisión Global -->
+      <div class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-6 rounded-2xl shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-lg font-bold">Panel de Supervisión en Vivo</h2>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Monitoreo en Tiempo Real
+              </span>
+            </div>
+            <p class="text-xs text-indigo-200 mt-1">Supervisa estados, llamadas en curso y recaudación individual de cada operador.</p>
+          </div>
+
+          <!-- Botón de Simulación de Actividad -->
+          <button id="btn-toggle-simulacion" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-2 self-start md:self-auto">
+            <i class="fas fa-play"></i> Iniciar Simulación en Vivo
+          </button>
+        </div>
+
+        <!-- Indicadores consolidados del equipo -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-indigo-900/60 text-xs">
+          <div class="p-3 bg-white/5 rounded-xl border border-white/10">
+            <div class="text-indigo-200">Operadores Conectados</div>
+            <div id="sup-ops-activos" class="text-lg font-extrabold text-white mt-0.5">0 / 0</div>
+          </div>
+          <div class="p-3 bg-white/5 rounded-xl border border-white/10">
+            <div class="text-indigo-200">Llamadas Realizadas Hoy</div>
+            <div id="sup-ops-llamadas" class="text-lg font-extrabold text-white mt-0.5">0</div>
+          </div>
+          <div class="p-3 bg-white/5 rounded-xl border border-white/10">
+            <div class="text-indigo-200">Promesas Conseguidas</div>
+            <div id="sup-ops-promesas" class="text-lg font-extrabold text-blue-400 mt-0.5">0</div>
+          </div>
+          <div class="p-3 bg-white/5 rounded-xl border border-white/10">
+            <div class="text-indigo-200">Total Recuperado Hoy</div>
+            <div id="sup-ops-recaudado" class="text-lg font-extrabold text-emerald-400 mt-0.5">$ 0</div>
+          </div>
+        </div>
+
+        <!-- Barra colectiva de meta -->
+        <div class="mt-4">
+          <div class="flex justify-between text-xs text-indigo-200 mb-1 font-semibold">
+            <span>Meta Diaria del Call Center</span>
+            <span id="sup-ops-pct-meta">0%</span>
+          </div>
+          <div class="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+            <div id="sup-ops-progreso-barra" class="h-2.5 bg-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenedor Principal: Matriz de Operadores + Ranking -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Matriz de Tarjetas de Operadores (8 columnas) -->
+        <div class="lg:col-span-8 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i class="fas fa-users text-blue-600"></i> Equipo de Operadores
+            </h3>
+            <span class="text-xs text-slate-400">Haz clic en los botones para cambiar estados o ver cartera</span>
+          </div>
+          <div id="grid-operadores" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Renderizado dinámico de tarjetas de operadores -->
+          </div>
+        </div>
+
+        <!-- Ranking de Rendimiento / Podio (4 columnas) -->
+        <div class="lg:col-span-4 space-y-4">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                <i class="fas fa-trophy text-amber-500"></i> Ranking del Día
+              </h3>
+              <span class="text-xs text-slate-400">Por monto cobrado</span>
+            </div>
+            <div id="ranking-operadores" class="space-y-2">
+              <!-- Renderizado dinámico del ranking -->
+            </div>
+          </div>
+
+          <!-- Protocolo de Supervisión Informativo -->
+          <div class="bg-blue-50/60 p-4 rounded-xl border border-blue-200/60 text-xs text-blue-900 space-y-2">
+            <div class="font-bold flex items-center gap-1.5 text-blue-800">
+              <i class="fas fa-circle-info"></i> Funciones de Supervisión
+            </div>
+            <p class="leading-relaxed text-blue-950/80">
+              • <strong>Reasignación:</strong> Puedes reasignar un titular a cualquier operador desde la ficha del deudor.<br>
+              • <strong>Control de estados:</strong> Los botones rápidos permiten marcar pausas de refrigerio o asignar llamadas.<br>
+              • <strong>Simulación en vivo:</strong> Activa el simulador para proyectar cambios de llamadas y avances automáticos.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 6. PESTAÑA: ANALIZADOR MANGO CRM (AUDITORÍA & OPERADORES) -->
+    <!-- ============================================================= -->
+    <section id="tab-mango" class="tab-pane space-y-6">
+
+      <!-- Banner Superior Analizador Mango -->
+      <div class="p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white border border-emerald-500/20 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white text-2xl shadow-lg shadow-emerald-500/30">
+            <i class="fas fa-file-excel"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-black tracking-tight">Analizador de Gestiones <span class="text-emerald-400">Mango CRM</span></h2>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-[10px] border border-emerald-500/30">Auditoría & KPIs</span>
+            </div>
+            <p class="text-xs text-slate-300 mt-1 max-w-xl">
+              Carga tu reporte de gestiones de Mango (<code class="text-emerald-300 font-mono text-[11px]">negociatudeuda.com.ar</code>) para auditar la productividad, promesas pactadas, trazabilidad de DNIs tocados por cada operador y recomendaciones para mejorar la base.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="btn-mango-cargar-demo" class="px-3.5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl font-bold text-xs transition-all shadow-md flex items-center gap-2">
+            <i class="fas fa-wand-magic-sparkles text-amber-300"></i>
+            <span>Cargar Ejemplo de Mango (1 Clic)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Zona de Carga Drag & Drop -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <div id="mango-drop-zone" class="border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-slate-50/60 hover:bg-emerald-50/30 rounded-2xl p-6 text-center transition-all cursor-pointer">
+          <input type="file" id="mango-file-input" accept=".xlsx, .xls, .csv, .txt" class="hidden" />
+          <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-2 text-xl">
+            <i class="fas fa-cloud-arrow-up"></i>
+          </div>
+          <div id="mango-drop-text" class="text-xs text-slate-700">
+            <span class="text-emerald-700 font-bold hover:underline">Haz clic aquí para seleccionar o arrastra tu archivo</span> Excel (.xlsx / .xls) o CSV de CRM Mango
+            <p class="text-[11px] text-slate-400 mt-1">Exportación estándar de gestiones con columnas de entidades, DNI, operador, resultados, montos e hipervínculos.</p>
+          </div>
+        </div>
+
+        <!-- Guía de compatibilidad de columnas -->
+        <div class="flex flex-wrap items-center justify-between text-[11px] text-slate-500 bg-slate-100/70 px-4 py-2 rounded-xl">
+          <div class="flex items-center gap-1.5">
+            <i class="fas fa-check-circle text-emerald-500"></i>
+            <span>Columnas detectadas automáticamente: <code class="text-slate-700 font-mono">entidades.cDescr</code>, <code class="text-slate-700 font-mono">personas.nNumeroDocumento</code>, <code class="text-slate-700 font-mono">usuarios.cNombre</code>, <code class="text-slate-700 font-mono">resultados.cDescr</code>, <code class="text-slate-700 font-mono">gestiones.nMonto</code></span>
+          </div>
+          <div class="font-semibold text-slate-600">
+            🔒 Procesamiento 100% privado en tu navegador (sin envíos externos)
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenedor Principal de Análisis (Se activa al cargar datos) -->
+      <div id="mango-analisis-container" class="hidden space-y-6 animate-fadeIn">
+
+        <!-- Barra de Filtros Interactivos -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+          <div class="flex items-center justify-between border-b pb-2">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-filter text-emerald-600"></i>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Filtros Cruzados del Reporte</h3>
+            </div>
+            <button id="btn-mango-limpiar-filtros" class="text-[11px] text-slate-400 hover:text-rose-600 font-semibold flex items-center gap-1">
+              <i class="fas fa-rotate-left"></i> Restablecer Filtros
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 text-xs">
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Cartera / Entidad</label>
+              <select id="mango-filtro-entidad" class="w-full p-2 bg-slate-50 border rounded-xl text-slate-700 focus:ring-2 focus:ring-emerald-500 font-medium">
+                <option value="TODOS">Todas las Carteras</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Operador</label>
+              <select id="mango-filtro-operador" class="w-full p-2 bg-slate-50 border rounded-xl text-slate-700 focus:ring-2 focus:ring-emerald-500 font-medium">
+                <option value="TODOS">Todos los Operadores</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Canal de Gestión</label>
+              <select id="mango-filtro-canal" class="w-full p-2 bg-slate-50 border rounded-xl text-slate-700 focus:ring-2 focus:ring-emerald-500 font-medium">
+                <option value="TODOS">Todos los Canales</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Resultado / Tipificación</label>
+              <select id="mango-filtro-resultado" class="w-full p-2 bg-slate-50 border rounded-xl text-slate-700 focus:ring-2 focus:ring-emerald-500 font-medium">
+                <option value="TODOS">Todos los Resultados</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Criterio de Fecha</label>
+              <select id="mango-filtro-tipo-fecha" class="w-full p-2 bg-slate-50 border rounded-xl text-slate-700 focus:ring-2 focus:ring-emerald-500 font-medium">
+                <option value="GESTION" selected>Fecha Gestión (dtFechHora)</option>
+                <option value="PROXIMA">Próx. Acción (dtProxAcci)</option>
+                <option value="AMBAS">Ambas Fechas</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Fecha Desde</label>
+              <input type="date" id="mango-filtro-fecha-desde" class="w-full p-2 bg-slate-50 border rounded-xl text-slate-700 focus:ring-2 focus:ring-emerald-500 font-medium" />
+            </div>
+
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Fecha Hasta</label>
+              <input type="date" id="mango-filtro-fecha-hasta" class="w-full p-2 bg-slate-50 border rounded-xl text-slate-700 focus:ring-2 focus:ring-emerald-500 font-medium" />
+            </div>
+          </div>
+
+          <!-- Barra de Acciones y Atajos de Filtro -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+            <div class="flex flex-wrap items-center gap-2">
+              <!-- Botón Principal de Acción -->
+              <button id="btn-mango-aplicar-filtros" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-xs font-black transition-all shadow-md shadow-emerald-600/20 flex items-center gap-2">
+                <i class="fas fa-filter text-emerald-200"></i>
+                <span>Aplicar Filtros</span>
+              </button>
+
+              <button id="btn-mango-limpiar-filtros-bar" onclick="MangoAnalyzerModule.limpiarFiltros()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5">
+                <i class="fas fa-rotate-left"></i>
+                <span>Restablecer</span>
+              </button>
+
+              <!-- Atajos Rápidos de Fechas -->
+              <div class="hidden sm:flex items-center gap-1 pl-2 border-l border-slate-200 text-[11px]">
+                <span class="text-slate-400 font-semibold mr-1">Rango:</span>
+                <button type="button" onclick="MangoAnalyzerModule.establecerRangoFecha('hoy')" class="px-2 py-1 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 rounded-lg font-bold transition-colors">Hoy</button>
+                <button type="button" onclick="MangoAnalyzerModule.establecerRangoFecha('7dias')" class="px-2 py-1 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 rounded-lg font-bold transition-colors">Últimos 7d</button>
+                <button type="button" onclick="MangoAnalyzerModule.establecerRangoFecha('mes')" class="px-2 py-1 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 rounded-lg font-bold transition-colors">Este Mes</button>
+                <button type="button" onclick="MangoAnalyzerModule.establecerRangoFecha('todo')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg font-bold transition-colors">Todo</button>
+              </div>
+            </div>
+
+            <!-- Resumen dinámico del filtro -->
+            <div id="mango-filtros-resumen" class="text-xs text-slate-500 font-medium"></div>
+          </div>
+        </div>
+
+        <!-- Tarjetas de KPIs Globales -->
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Total Gestiones -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Gestiones</span>
+              <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <i class="fas fa-list-check"></i>
+              </div>
+            </div>
+            <div id="mango-kpi-gestiones" class="text-2xl font-black text-slate-800 mt-2">0</div>
+            <div class="flex items-center gap-1.5 text-[11px] text-slate-500 mt-1">
+              <span>Intensidad:</span>
+              <strong id="mango-kpi-intensidad" class="text-blue-600">0 toques/DNI</strong>
+            </div>
+          </div>
+
+          <!-- DNIs Únicos Trabajados -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">DNIs Únicos Tocados</span>
+              <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                <i class="fas fa-id-card"></i>
+              </div>
+            </div>
+            <div id="mango-kpi-dnis" class="text-2xl font-black text-slate-800 mt-2">0</div>
+            <div class="flex items-center gap-1.5 text-[11px] text-slate-500 mt-1">
+              <span>Amplitud de base alcanzada</span>
+            </div>
+            <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+              <span class="flex items-center gap-1"><i class="fas fa-gauge-high text-purple-500"></i> Ritmo Diario:</span>
+              <strong id="mango-kpi-promedio-dnis-dia" class="text-purple-700 font-bold">0 DNIs/día (Meta: 60)</strong>
+            </div>
+          </div>
+
+          <!-- Total Promesas / Pagos a Imputar -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Promesas Acordadas</span>
+              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i class="fas fa-handshake"></i>
+              </div>
+            </div>
+            <div id="mango-kpi-promesas" class="text-2xl font-black text-emerald-600 mt-2">0</div>
+            <div class="flex items-center gap-1.5 text-[11px] text-slate-500 mt-1">
+              <span>Tasa de Conversión:</span>
+              <strong id="mango-kpi-conversion" class="text-emerald-700">0%</strong>
+            </div>
+          </div>
+
+          <!-- Monto Total Prometido -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Monto Prometido Total</span>
+              <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <i class="fas fa-dollar-sign"></i>
+              </div>
+            </div>
+            <div id="mango-kpi-monto" class="text-2xl font-black text-slate-800 mt-2">$0</div>
+            <div class="flex items-center gap-1.5 text-[11px] text-slate-500 mt-1">
+              <span>Ticket Promedio:</span>
+              <strong id="mango-kpi-ticket" class="text-slate-700">$0</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Módulo de Auditoría y Diagnóstico de Calidad de Datos (EN QUÉ MEJORAR) -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                  <i class="fas fa-stethoscope"></i>
+                </div>
+                <h3 class="text-sm font-bold text-slate-800">Diagnóstico de Calidad de Datos y Auditoría Operativa</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Indicadores automáticos para detectar sobre-gestión, notas vacías, desbalance de canales y promesas sin respaldo.</p>
+            </div>
+
+            <!-- Health Score Bar -->
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <span class="text-[10px] text-slate-400 uppercase font-bold block">Score de Salud</span>
+                <span id="mango-auditoria-score" class="text-lg font-black text-slate-800">100/100</span>
+              </div>
+              <div class="w-32 bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                <div id="mango-auditoria-score-bar" class="bg-emerald-500 h-2.5 rounded-full" style="width: 100%"></div>
+              </div>
+              <div id="mango-auditoria-score-badge"></div>
+            </div>
+          </div>
+
+          <!-- Lista de Alertas Inteligentes de Auditoría -->
+          <div id="mango-auditoria-alertas-lista" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <!-- Renderizado dinámico -->
+          </div>
+        </div>
+
+        <!-- Gráficos de Productividad y Distribución -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <!-- Gráfico Comparativo Operadores (2 columnas) -->
+          <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-chart-column text-blue-600"></i>
+                <h4 class="text-xs font-bold text-slate-800">Gestiones vs Promesas por Operador</h4>
+              </div>
+              <span class="text-[10px] text-slate-400">Top 10 en volumen</span>
+            </div>
+            <div class="h-64 relative">
+              <canvas id="mango-chart-operadores"></canvas>
+            </div>
+          </div>
+
+          <!-- Canales y Tipificaciones (1 columna) -->
+          <div class="space-y-4">
+            <!-- Gráfico Canales -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-chart-pie text-emerald-600"></i>
+                  <h4 class="text-xs font-bold text-slate-800">Canales de Contacto</h4>
+                </div>
+              </div>
+              <div class="h-40 relative">
+                <canvas id="mango-chart-canales"></canvas>
+              </div>
+            </div>
+
+            <!-- Gráfico Resultados -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-tags text-purple-600"></i>
+                  <h4 class="text-xs font-bold text-slate-800">Tipificaciones Principales</h4>
+                </div>
+              </div>
+              <div class="h-40 relative">
+                <canvas id="mango-chart-resultados"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ranking Comparativo de Operadores -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/70">
+            <div>
+              <div class="flex items-center gap-2">
+                <i class="fas fa-trophy text-amber-500"></i>
+                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Tabla de Rendimiento y Ranking de Operadores</h4>
+              </div>
+              <p class="text-[11px] text-slate-500">Haz clic en <strong>"Ver DNIs"</strong> para auditar cada DNI trabajado por un cobrador.</p>
+            </div>
+            <button id="btn-mango-exportar-operadores" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm">
+              <i class="fas fa-file-excel"></i> Exportar Ranking Excel
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left">
+              <thead class="bg-slate-100/80 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                <tr>
+                  <th class="px-3 py-2.5 text-center">#</th>
+                  <th class="px-3 py-2.5">Operador</th>
+                  <th class="px-3 py-2.5 text-center">Total Gestiones</th>
+                  <th class="px-3 py-2.5 text-center">DNIs Únicos</th>
+                  <th class="px-3 py-2.5 text-center">DNIs/Día (Meta: 60)</th>
+                  <th class="px-3 py-2.5 text-center">% Contacto</th>
+                  <th class="px-3 py-2.5 text-center">Promesas</th>
+                  <th class="px-3 py-2.5 text-right">Monto Prometido</th>
+                  <th class="px-3 py-2.5 text-center">Calidad Datos</th>
+                  <th class="px-3 py-2.5 text-center">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="mango-tabla-operadores-tbody">
+                <!-- Filas dinámicas -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- FICHA DETALLADA DEL OPERADOR Y TRAZABILIDAD DE DNIs -->
+        <!-- ========================================================= -->
+        <div id="mango-seccion-operador-detalle" class="bg-white rounded-3xl border-2 border-blue-500/30 shadow-xl overflow-hidden space-y-4 p-6">
+          
+          <!-- Encabezado de la Ficha del Operador -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-xl shadow-md">
+                <i class="fas fa-user-gear"></i>
+              </div>
+              <div>
+                <span class="text-[10px] text-blue-600 font-bold uppercase tracking-wider">Ficha de Auditoría Individual</span>
+                <h3 class="text-base font-black text-slate-800 flex items-center gap-2">
+                  <span id="mango-op-nombre-header">Selecciona un operador</span>
+                </h3>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <label class="text-xs font-semibold text-slate-600 hidden sm:inline">Cambiar Operador:</label>
+              <select id="mango-selector-op-detalle" class="p-2 bg-slate-50 border rounded-xl text-xs font-bold text-slate-800 focus:ring-2 focus:ring-blue-500">
+                <!-- Opciones dinámicas -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Mini KPIs del Operador -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-center text-xs">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <span class="text-[10px] text-slate-400 block font-semibold">Gestiones</span>
+              <strong id="mango-op-kpi-gestiones" class="text-sm text-blue-600 font-black">0</strong>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <span class="text-[10px] text-slate-400 block font-semibold">DNIs Tocados</span>
+              <strong id="mango-op-kpi-dnis" class="text-sm text-purple-600 font-black">0</strong>
+            </div>
+            <div class="p-3 bg-purple-50/60 rounded-xl border border-purple-100">
+              <span class="text-[10px] text-purple-600 block font-semibold">DNIs / Día (Meta: 60)</span>
+              <strong id="mango-op-kpi-dnis-dia" class="text-xs text-purple-800 font-black">0 / día</strong>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <span class="text-[10px] text-slate-400 block font-semibold">Intensidad</span>
+              <strong id="mango-op-kpi-intensidad" class="text-sm text-slate-700 font-black">0</strong>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <span class="text-[10px] text-slate-400 block font-semibold">% Contacto</span>
+              <strong id="mango-op-kpi-contactabilidad" class="text-sm text-slate-800 font-black">0%</strong>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <span class="text-[10px] text-slate-400 block font-semibold">Promesas</span>
+              <strong id="mango-op-kpi-promesas" class="text-sm text-emerald-600 font-black">0</strong>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <span class="text-[10px] text-slate-400 block font-semibold">Conversión</span>
+              <strong id="mango-op-kpi-conversion" class="text-sm text-emerald-700 font-black">0%</strong>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 col-span-2 sm:col-span-1">
+              <span class="text-[10px] text-slate-400 block font-semibold">Monto Prometido</span>
+              <strong id="mango-op-kpi-monto" class="text-sm text-slate-900 font-black">$0</strong>
+            </div>
+          </div>
+
+          <!-- Diagnóstico Individual de Mejora para el Operador -->
+          <div id="mango-op-diagnostico-container">
+            <!-- Tarjetas de mejora individual -->
+          </div>
+
+          <!-- Tabla de DNIs Tocados por este Operador -->
+          <div class="border border-slate-200 rounded-2xl overflow-hidden mt-4">
+            <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-list-numeric text-blue-600"></i>
+                  <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Listado de DNIs Tocados por este Operador</h4>
+                  <span id="mango-op-dnis-count-badge" class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold text-[10px]">0 DNIs</span>
+                </div>
+                <p class="text-[11px] text-slate-500">Haz clic en cualquier DNI para consultar su trazabilidad o en "Mango" para abrir la gestión directa.</p>
+              </div>
+
+              <!-- Filtros y Exportación de DNIs -->
+              <div class="flex flex-wrap items-center gap-2">
+                <div class="relative">
+                  <i class="fas fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                  <input type="text" id="mango-op-buscar-dni" placeholder="Filtrar por DNI o Titular..." 
+                         class="pl-8 pr-3 py-1.5 bg-white border rounded-xl text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 w-48 sm:w-56" />
+                </div>
+
+                <select id="mango-op-filtro-resultado" class="p-1.5 bg-white border rounded-xl text-xs text-slate-700 font-medium focus:ring-2 focus:ring-blue-500">
+                  <option value="TODOS">Todos los Resultados</option>
+                  <option value="ACUERDOS_SIN_PAGO">⭐ Acuerdos sin Pago a Imputar (Cuotas Pendientes)</option>
+                  <option value="SIN_PAGO_IMPUTAR">Sin Pago a Imputar (No Abonados)</option>
+                  <option value="CON_PAGO_IMPUTAR">Con Pago a Imputar (Abonados)</option>
+                  <option value="PROMESAS">Solo Promesas de Pago</option>
+                  <option value="CONTACTADOS">Solo Contactados</option>
+                  <option value="NO_CONTACTADOS">Solo Sin Contacto / Ocupado</option>
+                </select>
+
+                <button id="btn-mango-exportar-dnis-op" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1 shadow-sm">
+                  <i class="fas fa-file-excel"></i> Exportar DNIs
+                </button>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto max-h-96">
+              <table class="w-full text-left">
+                <thead class="bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider sticky top-0 border-b">
+                  <tr>
+                    <th class="px-3 py-2.5">DNI</th>
+                    <th class="px-3 py-2.5">Titular</th>
+                    <th class="px-3 py-2.5">Cartera</th>
+                    <th class="px-3 py-2.5 text-center">Toques</th>
+                    <th class="px-3 py-2.5">Último Resultado</th>
+                    <th class="px-3 py-2.5 text-center">Estado Pago</th>
+                    <th class="px-3 py-2.5 text-center">Vencimiento</th>
+                    <th class="px-3 py-2.5 text-right">Monto Promesa</th>
+                    <th class="px-3 py-2.5">Última Observación</th>
+                    <th class="px-3 py-2.5 text-center">CRM Mango</th>
+                  </tr>
+                </thead>
+                <tbody id="mango-tabla-dnis-op-tbody">
+                  <!-- Filas de DNIs del operador -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal de Trazabilidad Universal de DNI -->
+      <div id="mango-modal-trazabilidad-dni" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200">
+          <div class="flex items-center justify-between border-b pb-3 mb-4">
+            <div class="flex items-center gap-2">
+              <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <i class="fas fa-timeline"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-slate-800">Trazabilidad Cronológica de DNI</h3>
+                <p class="text-xs text-slate-400">Historial completo de intentos, canales y operadores para este deudor</p>
+              </div>
+            </div>
+            <button onclick="document.getElementById('mango-modal-trazabilidad-dni').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 text-lg">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <div id="mango-trazabilidad-dni-resultado">
+            <!-- Contenido dinámico del DNI -->
+          </div>
+
+          <div class="mt-4 pt-3 border-t flex justify-end">
+            <button type="button" onclick="document.getElementById('mango-modal-trazabilidad-dni').classList.add('hidden')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs">
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de Detalle de Gestiones a Mejorar (Auditoría / Diagnóstico) -->
+      <div id="mango-modal-auditoria-detalle" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+        <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+          
+          <!-- Header del Modal -->
+          <div class="p-5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/50">
+            <div class="flex items-center gap-3">
+              <div id="mango-auditoria-modal-icono" class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg bg-rose-100 text-rose-600">
+                <i class="fas fa-triangle-exclamation"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 id="mango-auditoria-modal-titulo" class="text-sm font-black text-slate-800">Gestiones a Mejorar</h3>
+                  <span id="mango-auditoria-modal-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-700">0 casos</span>
+                </div>
+                <p class="text-xs text-slate-400 mt-0.5">Listado detallado de registros que requieren corrección o seguimiento de supervisión</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="MangoAnalyzerModule.exportarCasosAuditoria()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all">
+                <i class="fas fa-file-excel"></i>
+                <span>Exportar a Excel</span>
+              </button>
+              <button onclick="document.getElementById('mango-modal-auditoria-detalle').classList.add('hidden')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition-colors">
+                <i class="fas fa-times text-sm"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Banner de Recomendación & Coaching -->
+          <div id="mango-auditoria-modal-recomendacion" class="p-4 pb-0 shrink-0">
+            <!-- Dinámico -->
+          </div>
+
+          <!-- Barra de Búsqueda y Filtro de Casos -->
+          <div class="p-4 pb-2 flex flex-wrap items-center justify-between gap-3 shrink-0">
+            <div class="relative flex-1 min-w-[240px]">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="mango-auditoria-modal-buscar" placeholder="Buscar por DNI, Titular u Operador..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-medium focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all" />
+            </div>
+            <div id="mango-auditoria-modal-contador" class="text-xs text-slate-400 font-medium"></div>
+          </div>
+
+          <!-- Contenedor Scrollable de la Tabla -->
+          <div class="p-4 pt-2 overflow-y-auto flex-1">
+            <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead class="bg-slate-50 text-slate-500 font-bold border-b text-[11px] sticky top-0 z-10 uppercase tracking-wider">
+                  <tr>
+                    <th class="p-3">DNI</th>
+                    <th class="p-3">Titular</th>
+                    <th class="p-3">Operador</th>
+                    <th class="p-3">Fecha Gestión</th>
+                    <th class="p-3">Canal</th>
+                    <th class="p-3">Resultado</th>
+                    <th class="p-3 text-center">Vencimiento Acuerdo</th>
+                    <th class="p-3">Observación Registrada</th>
+                    <th class="p-3 text-center">Monto</th>
+                    <th class="p-3 text-center">Mango CRM</th>
+                  </tr>
+                </thead>
+                <tbody id="mango-auditoria-modal-tbody" class="divide-y divide-slate-100">
+                  <!-- Filas dinámicas -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Footer del Modal -->
+          <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between shrink-0">
+            <p class="text-[11px] text-slate-400">
+              <i class="fas fa-shield-halved mr-1"></i> Auditoría Operativa CobranzasPro & Mango CRM
+            </p>
+            <button type="button" onclick="document.getElementById('mango-modal-auditoria-detalle').classList.add('hidden')" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition-colors">
+              Cerrar
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ============================================================= -->
+  <!-- MODALES DE LA APLICACIÓN -->
+  <!-- ============================================================= -->
+
+  <!-- Modal 1: Registrar Nueva Gestión de Cobranza -->
+  <div id="modal-gestion" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-overlay">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-fadeIn">
+      <div class="flex items-start justify-between border-b pb-3 mb-4">
+        <div>
+          <h3 class="text-base font-bold text-slate-800">Registrar Gestión de Cobranza</h3>
+          <p class="text-xs text-slate-500">Titular: <strong id="modal-gestion-titular-nombre" class="text-blue-600"></strong></p>
+          <p class="text-xs text-slate-400">Deuda actual: <span id="modal-gestion-deuda" class="font-semibold text-red-600"></span></p>
+        </div>
+        <button onclick="TitularesModule.cerrarModalGestion()" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form id="form-nueva-gestion" class="space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Canal de Contacto</label>
+            <select id="gestion-canal" class="w-full p-2.5 bg-slate-50 border rounded-xl text-slate-800 focus:ring-2 focus:ring-blue-500">
+              <option value="Llamada telefónica">Llamada Telefónica</option>
+              <option value="WhatsApp">WhatsApp</option>
+              <option value="Email">Correo Electrónico</option>
+              <option value="Visita presencial">Visita Presencial</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Operador a Cargo</label>
+            <select id="gestion-operador" class="w-full p-2.5 bg-slate-50 border rounded-xl text-slate-800 focus:ring-2 focus:ring-blue-500">
+              <!-- Opciones dinámicas -->
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Resultado de la Gestión</label>
+          <select id="gestion-resultado" class="w-full p-2.5 bg-slate-50 border rounded-xl text-slate-800 font-semibold focus:ring-2 focus:ring-blue-500">
+            <option value="Compromiso de Pago">Compromiso / Promesa de Pago</option>
+            <option value="No Contesta / Buzón">No Contesta / Buzón de Voz</option>
+            <option value="Teléfono Ocupado">Teléfono Ocupado</option>
+            <option value="Negativa de Pago">Negativa de Pago</option>
+            <option value="Número Equivocado">Número Erróneo / Inexistente</option>
+            <option value="Acuerdo de Cuotas">Plan de Cuotas Acordado</option>
+          </select>
+        </div>
+
+        <!-- Contenedor condicional para promesa de pago -->
+        <div id="container-promesa-pago" class="p-3 bg-amber-50 rounded-xl border border-amber-200 space-y-3">
+          <div class="font-bold text-amber-800 flex items-center gap-1.5">
+            <i class="fas fa-handshake"></i> Datos de la Promesa de Pago
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-amber-900 mb-1">Monto Prometido ($)</label>
+              <input type="number" id="promesa-monto" placeholder="Ej: 50000" class="w-full p-2 bg-white border border-amber-300 rounded-lg text-slate-800 font-bold">
+            </div>
+            <div>
+              <label class="block font-semibold text-amber-900 mb-1">Fecha Límite</label>
+              <input type="date" id="promesa-fecha" class="w-full p-2 bg-white border border-amber-300 rounded-lg text-slate-800">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Observaciones y Detalle de la Conversación</label>
+          <textarea id="gestion-observaciones" rows="3" required placeholder="Escriba aquí los detalles de la respuesta del deudor..." class="w-full p-2.5 bg-slate-50 border rounded-xl text-slate-800 focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="TitularesModule.cerrarModalGestion()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl">
+            Cancelar
+          </button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-sm">
+            Guardar Gestión
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Registrar Pago / Cobro -->
+  <div id="modal-pago" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-overlay">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-fadeIn">
+      <div class="flex items-start justify-between border-b pb-3 mb-4">
+        <div>
+          <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+            <i class="fas fa-hand-holding-dollar text-emerald-600"></i> Registrar Ingreso de Pago
+          </h3>
+          <p class="text-xs text-slate-500">Titular: <strong id="modal-pago-titular-nombre" class="text-slate-800"></strong></p>
+          <p class="text-xs text-slate-400">Deuda actual exigible: <span id="modal-pago-deuda-actual" class="font-bold text-red-600"></span></p>
+        </div>
+        <button onclick="TitularesModule.cerrarModalPago()" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form id="form-registrar-pago" class="space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Monto a Cobrar ($)</label>
+            <input type="number" id="pago-monto" required min="1" class="w-full p-2.5 bg-emerald-50/50 border border-emerald-300 rounded-xl text-slate-900 font-extrabold text-base focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Medio de Pago</label>
+            <select id="pago-metodo" class="w-full p-2.5 bg-slate-50 border rounded-xl text-slate-800 focus:ring-2 focus:ring-emerald-500">
+              <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+              <option value="Mercado Pago / QR">Mercado Pago / QR</option>
+              <option value="Tarjeta de Débito">Tarjeta de Débito</option>
+              <option value="Efectivo / Cobrador">Efectivo / Cobrador</option>
+              <option value="Cheque Electrónico ECHEQ">Cheque Electrónico ECHEQ</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">N° Comprobante / Transacción</label>
+            <input type="text" id="pago-comprobante" placeholder="Ej: TR-884920" class="w-full p-2.5 bg-slate-50 border rounded-xl text-slate-800">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Operador que Recibe</label>
+            <select id="pago-operador" class="w-full p-2.5 bg-slate-50 border rounded-xl text-slate-800">
+              <!-- Opciones dinámicas -->
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Concepto / Detalle del Pago</label>
+          <input type="text" id="pago-concepto" value="Cancelación / Pago a cuenta de deuda" class="w-full p-2.5 bg-slate-50 border rounded-xl text-slate-800">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="TitularesModule.cerrarModalPago()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl">
+            Cancelar
+          </button>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-sm flex items-center gap-1.5">
+            <i class="fas fa-check"></i> Registrar y Emitir Recibo
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3: Recibo de Pago Imprimible -->
+  <div id="modal-recibo" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-overlay">
+    <div class="max-w-xl w-full" id="recibo-body">
+      <!-- Inyectado por JS -->
+    </div>
+  </div>
+
+  <!-- Modal 4: Reasignar Titular a otro Operador -->
+  <div id="modal-reasignar" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-overlay">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-fadeIn">
+      <div class="flex items-start justify-between border-b pb-3 mb-4">
+        <div>
+          <h3 class="text-base font-bold text-slate-800">Reasignar Cartera de Titular</h3>
+          <p class="text-xs text-slate-500">Titular: <strong id="reasignar-titular-nombre" class="text-slate-800"></strong></p>
+        </div>
+        <button onclick="OperadoresModule.cerrarModalReasignar()" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form id="form-reasignar-titular" class="space-y-4 text-xs">
+        <input type="hidden" id="reasignar-titular-id">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Seleccionar Nuevo Operador</label>
+          <select id="reasignar-nuevo-operador" class="w-full p-2.5 bg-slate-50 border rounded-xl text-slate-800 font-semibold focus:ring-2 focus:ring-blue-500">
+            <!-- Operadores dinámicos -->
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="OperadoresModule.cerrarModalReasignar()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl">
+            Cancelar
+          </button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm">
+            Confirmar Reasignación
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  </div> <!-- Fin de app-shell -->
+
+  <!-- Modal 5: Crear / Editar Usuario -->
+  <div id="modal-usuario" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-overlay">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-fadeIn">
+      <div class="flex items-start justify-between border-b pb-3 mb-4">
+        <div>
+          <h3 id="modal-usuario-titulo" class="text-base font-bold text-slate-800">Crear Nuevo Usuario</h3>
+          <p class="text-xs text-slate-500">Asigna nombre, usuario simple (nombre.apellido) y rol de acceso.</p>
+        </div>
+        <button onclick="OperacionesModule.cerrarModalUsuario()" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form id="form-modal-usuario" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Nombre Completo</label>
+          <input type="text" id="usuario-input-nombre" required placeholder="Ej: Marcela Benítez" class="w-full p-2.5 bg-slate-50 border rounded-xl text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Usuario de Ingreso (nombre.apellido)</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-mono">@</span>
+            <input type="text" id="usuario-input-login" required placeholder="marcela.benitez" class="w-full pl-8 pr-3 py-2.5 bg-slate-50 border rounded-xl text-slate-800 font-mono font-bold focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <span class="text-[10px] text-slate-400 mt-0.5 block">Se utilizará para iniciar sesión en la plataforma.</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Contraseña</label>
+            <input type="text" id="usuario-input-password" placeholder="123" class="w-full p-2.5 bg-slate-50 border rounded-xl text-slate-800 font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Estado</label>
+            <select id="usuario-input-estado" class="w-full p-2.5 bg-slate-50 border rounded-xl text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold">
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Rol y Nivel de Acceso</label>
+          <select id="usuario-input-rol" class="w-full p-2.5 bg-slate-50 border rounded-xl text-slate-800 font-bold focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <option value="operador">Operador (Búsqueda de titulares, deudas, llamadas y cobro)</option>
+            <option value="supervisor">Supervisor (Monitoreo de operadores y reportes)</option>
+            <option value="backoffice">Backoffice (Cargas masivas de carteras y usuarios)</option>
+            <option value="gerente">Gerente (Acceso total a todas las herramientas)</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="OperacionesModule.cerrarModalUsuario()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl">
+            Cancelar
+          </button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-sm flex items-center gap-1.5">
+            <i class="fas fa-save"></i> Guardar Usuario
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Contenedor de Alertas Toast -->
+  <div id="toast-container"></div>
+
+  <!-- SCRIPTS DE LA APLICACIÓN -->
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/titulares.js"></script>
+  <script src="js/operaciones.js"></script>
+  <script src="js/reportes.js"></script>
+  <script src="js/operadores.js"></script>
+  <script src="js/mango_analyzer.js?v=20260923_v8"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Asegurar que los datepickers de Mango no tengan min o max bloqueando el calendario
+    function desbloquearCalendariosMango() {
+      ['mango-filtro-fecha-desde', 'mango-filtro-fecha-hasta'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) { el.removeAttribute('min'); el.removeAttribute('max'); }
+      });
+    }
+    desbloquearCalendariosMango();
+    document.addEventListener('DOMContentLoaded', desbloquearCalendariosMango);
+    window.addEventListener('load', desbloquearCalendariosMango);
+  </script>
+</body>
+</html>
